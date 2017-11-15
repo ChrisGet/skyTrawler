@@ -5,7 +5,7 @@ Contact: Christopher.get\@sky.uk
 
 This tool is designed to extract the contents of a Sky PVR STB and store a textual
 representation of the content within text files.
-This will work with Sky+ HD (DRX890 and newer), Sky Q 1TB, and Sky Q Silver 2TB.
+This will work with Sky+ HD (DRX890 and newer), Sky Q 1TB, and Sky Q 2TB.
 
 ######### Pre-requisites #########
   OS:
