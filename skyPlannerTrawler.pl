@@ -27,6 +27,7 @@ GetOptions (    "interface=s" => \$interface,
 my $fullpath = abs_path(__FILE__);      			# Gets the full path to this script (including this script name)
 my $maindir = $fullpath;
 my $script = __FILE__;						# Just the script name
+$script =~ s/.+\/([^\/]+)$/$1/;					# Format the script name to accommodate running from another directory
 $maindir =~ s/\/$script$/\//;					# Get the main directory path that the script and associated files are in
 my $filedir = $maindir . 'files/';				# The main directory for reference files
 my $tmpdir = $filedir . 'tmp/';					# Temporary directory. Not currently used
