@@ -16,9 +16,10 @@ This will work with Sky+ HD (DRX890 and newer), Sky Q 1TB, and Sky Q Silver 2TB.
     - wget
     - gupnp-tools (which contains the 'gssdp-discover' utility)
     - libcpan-meta-perl ('cpan' utility for installing perl modules)
+    - libexpat1-dev
     
     -- Handy install line to copy and paste on to the command line:
-     apt-get install -y perl wget gupnp-tools libcpan-meta-perl
+     apt-get install -y perl wget gupnp-tools libcpan-meta-perl libexpat1-dev
     
   Perl modules (Installed via cpan):
     - JSON
