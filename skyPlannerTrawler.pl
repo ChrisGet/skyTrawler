@@ -122,8 +122,6 @@ foreach my $key (sort keys %stbs) {
 	select STDOUT;
 	my $xmlurl = $stbs{$key};
 	my $xmlres = `wget -T 3 -t 1 -q -U SKY "$xmlurl" -O -` // '';
-	#print "$xmlurl\n";
-	#my $xmlres = getURL("$xmlurl",'SKY');
 	if ($xmlres) {
 		if ($xmlres =~ /^ERROR/) {
 			print "ERROR: Unable to identify STB at $key:\n$xmlres\n";
@@ -143,9 +141,7 @@ foreach my $key (sort keys %stbs) {
 					next;
 				}
 				my $stbinfo = parseInfoJSON(\$infojson);
-				#print $$stbinfo . "\n\n";
 				my ($qtype) = $$stbinfo =~ /STB Type = (.+)/;
-				#print "Found $qtype\n";
 				chomp $qtype;
 				$qtype = lc($qtype);	# Force the text to lower case
 				$qtype =~ s/\s+//g;	# Remove whitespace from the boxtype
@@ -209,8 +205,6 @@ sub searchSkyQ {
 
 	##### First get the info from the STB as to how many items are in the planner
 	my $pvrinfourl = 'http://' . $$ip . ':' . $skyqport . '/as/pvr?limit=0&offset=0';
-	#print "$pvrinfourl\n";
-	#my $rawinfo = `/usr/bin/timeout 15 wget -T 10 "$pvrinfourl" -O - -nv -q` // '';
 	my $rawinfo = getURL($pvrinfourl);
 	if (!$rawinfo) {
 		print "ERROR: Failed to retreive planner content info from STB\n";
@@ -231,7 +225,6 @@ sub searchSkyQ {
 	my $pvrurl = 'http://' . $$ip . ':' . $skyqport . '/as/pvr?limit=' . $pvrtotal . '&offset=0';
 
 	my %pvr;
-	#my $content = `/usr/bin/timeout 15 wget -T 10 "$pvrurl" -O - -nv -q` // '';;
 	my $content = getURL($pvrurl);
 	if (!$content) {
 		print "ERROR: Failed to retreive planner content data from STB\n";
@@ -254,8 +247,6 @@ sub searchSkyQ {
 		return;
 	}
 	
-	#my @recs;
-	#my @scheduled;
 	my @items = @{$pvr{'pvrItems'}};
 	foreach my $item (@items) {
 		my %data = %{$item};
@@ -307,36 +298,7 @@ Duration (hh:mm:ss) = $dur
 Deleted = $deleted
 
 INFO
-
-		#if ($status =~ /scheduled/i) {
-		#	push(@scheduled,$finalinfo);
-		#} else {
-		#	push(@recs,$finalinfo);
-		#}
-
-		##### Check to see if we need to delete failed recordings
-		#if ($status =~ /FAILED/) {
-		#	if ($delfailed) {
-		#		if ($delfailed =~ /deletefailed/i) {
-		#			my $fulldelurl = $deleteurl . $pvrid;
-		#			my $ua = LWP::UserAgent->new;
-		#			$ua->request(POST $fulldelurl);
-		#		}
-		#	}
-		#}
 	}
-	
-	#my $reccnt = @recs;
-	#my $schedcnt = @scheduled;
-	#print "Found $reccnt recordings:\n\n";
-	#foreach my $rec (@recs) {
-	#	print "---------- New Item ----------\n$rec\n";
-	#}
-	
-	#print "\nFound $schedcnt scheduled recordings:\n\n";
-	#foreach my $sched (@scheduled) {
-	#	print "---------- New Item ----------\n$sched\n";
-	#}
 }
 
 sub searchSkyPlus {
