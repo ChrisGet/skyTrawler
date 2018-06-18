@@ -183,7 +183,6 @@ if (!$quiet) {
 sub searchSkyQ {
 	my ($ip,$stbinfo) = @_;
 	my $infourl = 'http://' . $$ip . ":$skyqport/as/system/information";
-	my $deleteurl = 'http://' . $$ip . ":$skyqport/as/pvr/action/delete?pvrid=";
 	
 	##### Get the serial number from the STB info and use that as the filename for its planners contents
 	my ($fname) = $$stbinfo =~ m/Serial = (\w+)/;
@@ -301,6 +300,13 @@ Duration (hh:mm:ss) = $dur
 Deleted = $deleted
 
 INFO
+
+		if ($error =~ /^Failed/i) {
+			if ($delfailed) {
+				my $deleteurl = 'http://' . $$ip . ":$skyqport/as/pvr/action/delete?pvrid=$pvrid";
+				getURL($deleteurl);
+			}
+		}
 	}
 }
 
@@ -536,7 +542,7 @@ sub processContent {
 				$error = 'Failed Recording';
 				##### Delete this recording if $delfailed is defined
 				if ($delfailed) {
-					deleteFailed($ip,$browseurl,\$formatted{'id'});
+					deleteFailedSkyPlus($ip,$browseurl,\$formatted{'id'});
 				}
 			} elsif ($contentstate eq 'Partial Content') {
 				$error = 'Part Recording';
