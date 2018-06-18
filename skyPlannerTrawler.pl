@@ -14,11 +14,13 @@ my $clearprev;
 my $help;
 my $quiet;
 my $resdir;
+my $delfailed;
 GetOptions (    "interface=s" => \$interface,
 		"clear_previous" => \$clearprev,
 		"stb_types=s" => \$boxtypes,
 		"search_time=s" => \$searchtime,
 		"results_directory=s" => \$resdir,
+		"delete_failed" => \$delfailed,
 		"help" => \$help,
 		"quiet" => \$quiet,
 		) or die "Error in command line arguments\n";
@@ -387,7 +389,7 @@ STBDATA
 			}
 		}
 		
-		my $processed = processContent($pdata);
+		my $processed = processContent($pdata,$ip,\$browseurl);
 		if ($processed) {
 			print $$processed . "\n\n" if (ref($processed) eq 'SCALAR');
 		}
@@ -440,7 +442,7 @@ CONTENT
 
 sub processContent {
 	use XML::Hash;
-	my ($data) = @_;
+	my ($data,$ip,$browseurl) = @_;
 	my @parts = split('item id=',$$data);
 	my $string;
 	my %data;
@@ -532,6 +534,10 @@ sub processContent {
 		if ($status =~ /Finished|Complete/ and $contentstate ne 'All Content') {
 			if ($part =~ /failed=\"1\"/) {
 				$error = 'Failed Recording';
+				##### Delete this recording if $delfailed is defined
+				if ($delfailed) {
+					deleteFailed($ip,$browseurl,\$formatted{'id'});
+				}
 			} elsif ($contentstate eq 'Partial Content') {
 				$error = 'Part Recording';
 			} else {
@@ -655,6 +661,34 @@ sub getURL {
 	return $stuff;
 }
 
+sub deleteFailedSkyPlus {
+	my ($ip,$browseurl,$bookid) = @_;
+	my $ua = new LWP::UserAgent;
+	my $port = '41653';
+	my $service = "http://$$ip\:$port$$browseurl";
+	$ua->agent("SKY");
+	
+	my $header = new HTTP::Headers (
+	'Content-Type'  => 'text/xml; charset="utf-8"',
+	'SOAPAction'    => '"urn:schemas-nds-com:service:SkyBrowse:2\#DestroyObject"',
+	);
+	
+	
+my $content = <<CONTENT;
+<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+<s:Body>
+<u:DestroyObject xmlns:u="urn:schemas-nds-com:service:SkyBrowse:2">
+<ObjectID>$$bookid</ObjectID>
+</u:DestroyObject>
+</s:Body>
+</s:Envelope>
+CONTENT
+	
+	my $request = new HTTP::Request('POST',$service,$header,$content);
+	my $response = $ua->request($request);
+}
+
 sub printHelp {
 print <<HELP;
 ********* Sky STB Planner Trawler *********
@@ -682,6 +716,8 @@ Key: 	(flag) = Just provide the option
 				# Multiple options can be selected by separating them with a comma e.g,
 					--stb_types "SkyQ,SkyQSilver"
 				
+ --delete_failed		# Delete failed recordings as they are discovered. These will still be reported on when they are
+ 				# discovered but will not then show up in subsequent searches
  --clear_previous (flag)	# Clear out stb data files from previous runs
  --quiet (flag)			# Suppress info messages from printing to STDOUT (Error messages will still print out)
 HELP
