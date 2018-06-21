@@ -284,6 +284,10 @@ sub searchSkyQ {
 			chomp($dur = `date "+%H:%M:%S" -u -d $thing` // 'N/A');			
 		}
 
+		if ($src =~ /VOD/) {
+			$channo = 'VOD';
+		}
+
 print <<INFO;
 Item Details:
 Item ID = $pvrid
@@ -575,7 +579,9 @@ sub processContent {
 
 		##### Check channel number
 		my $channum = 'N/A';
-		if (exists $formatted{'channelNr'}) {
+		if ($type =~ /On Demand/) {
+			$channum = 'VOD';
+		} elsif (exists $formatted{'channelNr'}) {
 			$channum = $formatted{'channelNr'};
 			if ($channum =~ /65535/) {
 				$channum = 'PVOD';
