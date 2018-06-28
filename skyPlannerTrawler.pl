@@ -389,7 +389,7 @@ STBDATA
 	my $fail;
 	until ($start > $matches or $fail) {
 		my $pdata = getSkyPlusXML($ip,\$browseurl,\$searchcont,\$start,\$end);
-		if ($$pdata =~ /Error/i) {
+		if ($$pdata =~ /^ERROR:/i) {
 			$fail = 1;
 		}
 
