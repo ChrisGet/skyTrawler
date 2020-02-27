@@ -71,7 +71,7 @@ if ($resdir) {
 my %boxtypes;
 if ($boxtypes) {
 	$boxtypes =~ s/\s+//g;
-	if ($boxtypes !~ /Sky\+|SkyQ|SkyQSilver/i) {
+	if ($boxtypes !~ /Sky\+|SkyQ|SkyQSilver|SkyQTitan/i) {
 		print "ERROR: Invalid stb_types option \"$boxtypes\". Check usage below\n\n";
 		printHelp();
 		exit;
@@ -626,7 +626,7 @@ sub parseInfoJSON {
 	my $decoded = $json->pretty->decode($$in);
 	my %hash = %{$decoded};
 	my ($serial,$sw,$hw) = ('N/A','N/A','N/A');
-	my %hwnames = ( 'X-Wing' => 'Sky Q', 'Falcon' => 'Sky Q Silver');
+	my %hwnames = ( 'X-Wing' => 'Sky Q', 'Falcon' => 'Sky Q Silver', 'Titan' => 'Sky Q Titan');
 
 	if (exists $hash{'modelNumber'}) { $sw = $hash{'modelNumber'} };
 	if (exists $hash{'serialNumber'}) { $serial = $hash{'serialNumber'} };
@@ -724,6 +724,7 @@ Key: 	(flag) = Just provide the option
  					"Sky+" -> Only analyse Sky+ STBs
  					"SkyQ" -> Only analyse SkyQ STBs
  					"SkyQSilver" -> Only analyse SkyQSilver STBs
+					"SkyQTitan" -> Only analyse SkyQTitan STBs
 	 			# (Options are case insensitive. If no VALID option is provided then BOTH types are analysed)
 				# Multiple options can be selected by separating them with a comma e.g,
 					--stb_types "SkyQ,SkyQSilver"
